@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 export const metadata = {
   title: 'ClipperCuts - Modern Barbershop Booking',
   description: 'Book your next haircut at ClipperCuts - the premier barbershop for modern styles and classic cuts.',
+  icons: []
 }
 
 export default function RootLayout({ children }) {

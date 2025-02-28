@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "framework": "nextjs",
+  "regions": ["sin1"],
+  "env": {
+    "NEXT_PUBLIC_SITE_URL": "https://clippercuts.vercel.app"
+  }
+}
