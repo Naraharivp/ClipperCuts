@@ -30,6 +30,34 @@ ClipperCuts is a modern, responsive web application for a barbershop that allows
 - Node.js 18.17.0 or later
 - npm or yarn
 
+### Setting Up Environment Variables
+
+1. Copy the `.env.local.example` file to a new file named `.env.local`:
+   ```bash
+   cp .env.local.example .env.local
+   ```
+
+2. Update the Supabase credentials in `.env.local` with your own Supabase project credentials:
+   ```
+   NEXT_PUBLIC_SUPABASE_URL=your-supabase-project-url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your-supabase-anon-key
+   ```
+
+3. For development purposes, you can bypass authentication by setting:
+   ```
+   NEXT_PUBLIC_BYPASS_AUTH=true
+   ```
+   Note: Only use this in development, never in production!
+
+### Authentication Troubleshooting
+
+If you encounter authentication issues:
+
+1. Make sure your Supabase credentials are correct in `.env.local`
+2. Check that you have created users in your Supabase authentication system
+3. For testing purposes, you can enable bypass authentication in development mode
+4. Clear your browser cookies if you're experiencing persistent login issues
+
 ### Installation
 
 1. Clone the repository:
@@ -45,15 +73,7 @@ npm install
 yarn install
 ```
 
-3. Set up environment variables:
-Create a `.env.local` file in the root directory with the following variables:
-```
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-NEXT_PUBLIC_SITE_URL=http://localhost:3000
-```
-
-4. Set up Supabase:
+3. Set up Supabase:
    - Create a new project in [Supabase](https://app.supabase.com)
    - Go to the SQL Editor in your Supabase dashboard
    - Run the SQL scripts in the `supabase` directory in the following order:
@@ -62,14 +82,14 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
      - Finally run `seed.sql` to populate the database with initial data
    - Copy your Supabase URL and anon key from Project Settings > API and update your `.env.local` file
 
-5. Run the development server:
+4. Run the development server:
 ```bash
 npm run dev
 # or
 yarn dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
 ## Database Schema
 

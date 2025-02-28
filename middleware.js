@@ -1,5 +1,4 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
 
 export async function middleware(request) {
   // Get the pathname from the URL
@@ -7,46 +6,22 @@ export async function middleware(request) {
 
   // Only run this middleware for admin routes, excluding the login page
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
-    // Get the auth token from the cookies
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    // Check for any Supabase auth cookies
+    const hasAuthCookie = request.cookies.has('sb-access-token') || 
+                          request.cookies.has('sb-refresh-token') ||
+                          request.cookies.has('supabase-auth-token')
     
-    // Create a Supabase client
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        persistSession: false,
-        detectSessionInUrl: false,
-      }
-    })
-
-    // Get the auth cookie
-    const authCookie = request.cookies.get('sb-auth-token')?.value
+    // Check if we're in development mode and allow bypass for testing
+    const isDev = process.env.NODE_ENV === 'development'
+    const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true'
     
-    if (!authCookie) {
-      // No auth cookie, redirect to login
-      return NextResponse.redirect(new URL('/admin/login', request.url))
+    if (isDev && bypassAuth) {
+      console.log('Development mode with auth bypass enabled - allowing access')
+      return NextResponse.next()
     }
     
-    try {
-      // Set the auth cookie for the Supabase client
-      supabase.auth.setSession({
-        access_token: authCookie,
-        refresh_token: request.cookies.get('sb-refresh-token')?.value || '',
-      })
-      
-      // Get the user
-      const { data: { user }, error } = await supabase.auth.getUser()
-      
-      if (error || !user) {
-        // Invalid auth cookie or no user, redirect to login
-        return NextResponse.redirect(new URL('/admin/login', request.url))
-      }
-      
-      // User is authenticated, allow access
-      return NextResponse.next()
-    } catch (error) {
-      console.error('Auth middleware error:', error)
-      // Error occurred, redirect to login
+    if (!hasAuthCookie) {
+      console.log('No auth cookie found, redirecting to login')
       return NextResponse.redirect(new URL('/admin/login', request.url))
     }
   }

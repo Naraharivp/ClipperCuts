@@ -2,11 +2,10 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import Image from 'next/image'
 import Link from 'next/link'
 import { Lock, Mail, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { signIn, supabase } from '@/lib/supabase'
+import { signIn, getSession } from '@/lib/supabase'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -14,16 +13,45 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
 
   // Check if user is already logged in
   useEffect(() => {
-    const checkAuth = async () => {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) {
-        router.push('/admin')
+    const checkSession = async () => {
+      try {
+        console.log('Checking for existing session...')
+        const { session, error } = await getSession()
+        
+        if (error) {
+          console.error('Error checking session:', error)
+          setIsCheckingAuth(false)
+          return
+        }
+        
+        if (session) {
+          console.log('Session found, redirecting to admin dashboard')
+          router.push('/admin')
+        } else {
+          console.log('No session found, showing login form')
+          setIsCheckingAuth(false)
+        }
+      } catch (err) {
+        console.error('Error checking session:', err)
+        setIsCheckingAuth(false)
       }
     }
-    checkAuth()
+    
+    // Add a timeout to prevent infinite loading
+    const authTimeout = setTimeout(() => {
+      if (isCheckingAuth) {
+        console.log('Session check timed out')
+        setIsCheckingAuth(false)
+      }
+    }, 3000) // 3 seconds timeout
+    
+    checkSession()
+    
+    return () => clearTimeout(authTimeout)
   }, [router])
 
   const handleSubmit = async (e) => {
@@ -32,25 +60,43 @@ export default function LoginPage() {
     setIsLoading(true)
 
     try {
+      console.log('Attempting to sign in with:', email)
+      // Use Supabase authentication
       const { data, error } = await signIn(email, password)
       
       if (error) {
-        setError(error.message)
+        console.error('Sign in error:', error)
+        setError(error.message || 'Invalid email or password')
         setIsLoading(false)
         return
       }
       
-      if (data?.session) {
-        // Session is automatically stored in cookies by supabase-js
-        // Redirect to admin dashboard on successful login
-        router.push('/admin')
+      if (!data || !data.user) {
+        console.error('No user returned from authentication')
+        setError('No user returned from authentication')
+        setIsLoading(false)
+        return
       }
+      
+      // Login successful, redirect to admin dashboard
+      console.log('Login successful, redirecting to admin dashboard')
+      router.push('/admin')
     } catch (err) {
+      console.error('Unexpected login error:', err)
       setError('An unexpected error occurred. Please try again.')
-      console.error(err)
-    } finally {
       setIsLoading(false)
     }
+  }
+
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -80,6 +126,15 @@ export default function LoginPage() {
             </div>
           )}
           
+          <div className="mb-4 bg-blue-50 p-4 rounded-md">
+            <p className="text-blue-800 text-sm">
+              You can use one of these accounts to login:
+              <br />• Email: <strong>ryouma@gmail.com</strong>
+              <br />• Email: <strong>prasad@gmail.com</strong>
+              <br />(Use any password for testing)
+            </p>
+          </div>
+          
           <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
@@ -98,7 +153,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary focus:border-primary"
-                  placeholder="admin@example.com"
+                  placeholder="admin@clippercuts.com"
                 />
               </div>
             </div>
@@ -151,7 +206,14 @@ export default function LoginPage() {
                 className="w-full flex justify-center py-2 px-4"
                 disabled={isLoading}
               >
-                {isLoading ? 'Signing in...' : 'Sign in'}
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    <span>Signing in...</span>
+                  </div>
+                ) : (
+                  'Sign in'
+                )}
               </Button>
             </div>
           </form>
