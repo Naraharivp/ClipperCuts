@@ -1,8 +1,8 @@
 "use client"
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter, usePathname } from 'next/navigation'
 import { 
   Calendar, 
   LayoutDashboard, 
@@ -18,12 +18,31 @@ import {
   User,
   ChevronRight
 } from 'lucide-react'
-import { signOut } from '@/lib/supabase'
+import { signOut, supabase } from '@/lib/supabase'
 
 export default function AdminLayout({ children }) {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
-  const pathname = router.pathname
+  const pathname = usePathname() || ''
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession()
+        if (!session) {
+          router.push('/admin/login')
+        }
+      } catch (error) {
+        console.error('Auth check error:', error)
+        router.push('/admin/login')
+      } finally {
+        setIsLoading(false)
+      }
+    }
+    
+    checkAuth()
+  }, [router])
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen)
@@ -45,22 +64,25 @@ export default function AdminLayout({ children }) {
   }
 
   const getBreadcrumbTitle = () => {
-    switch (pathname) {
-      case '/admin':
-        return 'Dashboard'
-      case '/admin/appointments':
-        return 'Appointments'
-      case '/admin/services':
-        return 'Services'
-      case '/admin/barbers':
-        return 'Barbers'
-      case '/admin/customers':
-        return 'Customers'
-      case '/admin/settings':
-        return 'Settings'
-      default:
-        return 'Dashboard'
-    }
+    if (pathname === '/admin') return 'Dashboard'
+    if (pathname === '/admin/bookings') return 'Bookings'
+    if (pathname === '/admin/barbers') return 'Barbers'
+    if (pathname === '/admin/services') return 'Services'
+    if (pathname === '/admin/customers') return 'Customers'
+    if (pathname === '/admin/settings') return 'Settings'
+    if (pathname === '/admin/testimonials') return 'Testimonials'
+    return 'Admin'
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -103,24 +125,13 @@ export default function AdminLayout({ children }) {
               </li>
               <li>
                 <Link
-                  href="/admin/appointments"
+                  href="/admin/bookings"
                   className={`flex items-center p-2 rounded-md ${
-                    pathname === '/admin/appointments' ? 'bg-primary-700' : 'hover:bg-primary-700'
+                    pathname === '/admin/bookings' ? 'bg-primary-700' : 'hover:bg-primary-700'
                   } transition-colors`}
                 >
                   <Calendar className="mr-3 h-5 w-5" />
-                  <span>Appointments</span>
-                </Link>
-              </li>
-              <li>
-                <Link
-                  href="/admin/services"
-                  className={`flex items-center p-2 rounded-md ${
-                    pathname === '/admin/services' ? 'bg-primary-700' : 'hover:bg-primary-700'
-                  } transition-colors`}
-                >
-                  <Scissors className="mr-3 h-5 w-5" />
-                  <span>Services</span>
+                  <span>Bookings</span>
                 </Link>
               </li>
               <li>
@@ -132,6 +143,17 @@ export default function AdminLayout({ children }) {
                 >
                   <Users className="mr-3 h-5 w-5" />
                   <span>Barbers</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/services"
+                  className={`flex items-center p-2 rounded-md ${
+                    pathname === '/admin/services' ? 'bg-primary-700' : 'hover:bg-primary-700'
+                  } transition-colors`}
+                >
+                  <Scissors className="mr-3 h-5 w-5" />
+                  <span>Services</span>
                 </Link>
               </li>
               <li>
@@ -154,6 +176,17 @@ export default function AdminLayout({ children }) {
                 >
                   <Settings className="mr-3 h-5 w-5" />
                   <span>Settings</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/testimonials"
+                  className={`flex items-center p-2 rounded-md ${
+                    pathname === '/admin/testimonials' ? 'bg-primary-700' : 'hover:bg-primary-700'
+                  } transition-colors`}
+                >
+                  <FileText className="mr-3 h-5 w-5" />
+                  <span>Testimonials</span>
                 </Link>
               </li>
             </ul>

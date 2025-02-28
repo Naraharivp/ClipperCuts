@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Lock, Mail, AlertCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import { signIn } from '@/lib/supabase'
+import { signIn, supabase } from '@/lib/supabase'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -14,6 +14,17 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.push('/admin')
+      }
+    }
+    checkAuth()
+  }, [router])
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -29,7 +40,8 @@ export default function LoginPage() {
         return
       }
       
-      if (data?.user) {
+      if (data?.session) {
+        // Session is automatically stored in cookies by supabase-js
         // Redirect to admin dashboard on successful login
         router.push('/admin')
       }
