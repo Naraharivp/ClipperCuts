@@ -35,6 +35,22 @@ export default function AdminLayout({ children }) {
       try {
         console.log('Checking authentication...')
         
+        // Check if authentication is disabled
+        if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
+          console.log('Authentication is disabled - allowing access to all admin pages')
+          setIsAuthenticated(true)
+          setIsLoading(false)
+          return
+        }
+        
+        // Allow access to login and register pages without authentication
+        if (pathname === '/admin/login' || pathname.startsWith('/admin/register')) {
+          console.log('Login or register page, skipping auth check')
+          setIsAuthenticated(true)
+          setIsLoading(false)
+          return
+        }
+        
         // Check if we're in development mode with bypass enabled
         const isDev = process.env.NODE_ENV === 'development'
         const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true'
@@ -44,6 +60,22 @@ export default function AdminLayout({ children }) {
           setIsAuthenticated(true)
           setIsLoading(false)
           return
+        }
+        
+        // Check for mock session in localStorage first (faster than Supabase check)
+        if (typeof window !== 'undefined') {
+          const mockSessionData = localStorage.getItem('mock_session');
+          if (mockSessionData) {
+            try {
+              console.log('Mock session found, user is authenticated')
+              setIsAuthenticated(true)
+              setIsLoading(false)
+              return
+            } catch (err) {
+              console.error('Error parsing mock session:', err);
+              // Continue with Supabase check
+            }
+          }
         }
         
         // Check if Supabase credentials are available
@@ -58,7 +90,11 @@ export default function AdminLayout({ children }) {
         
         if (error) {
           console.error('Error getting session:', error)
-          setAuthError(error.message || 'Error checking authentication')
+          if (error.message === 'Session check timed out') {
+            setAuthError('Authentication check timed out. Please try again.')
+          } else {
+            setAuthError(error.message || 'Error checking authentication')
+          }
           setIsLoading(false)
           router.push('/admin/login')
           return
@@ -66,6 +102,7 @@ export default function AdminLayout({ children }) {
         
         if (!session) {
           console.log('No session found, redirecting to login')
+          setIsLoading(false)
           router.push('/admin/login')
           return
         }
@@ -89,12 +126,12 @@ export default function AdminLayout({ children }) {
         setIsLoading(false)
         router.push('/admin/login')
       }
-    }, 5000) // 5 seconds timeout
+    }, 8000) // Increased to 8 seconds timeout
     
     checkAuth()
     
     return () => clearTimeout(authTimeout)
-  }, [router, isLoading])
+  }, [router])
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen)
@@ -110,6 +147,33 @@ export default function AdminLayout({ children }) {
       router.push('/admin/login')
     }
   }
+
+  // Function to clear all cookies and local storage
+  const clearAllCookies = () => {
+    try {
+      // Get all cookies
+      const cookies = document.cookie.split(';');
+      
+      // Remove each cookie
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i];
+        const eqPos = cookie.indexOf('=');
+        const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim();
+        document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/`;
+      }
+      
+      // Clear localStorage
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('mock_session');
+        localStorage.clear();
+      }
+      
+      // Refresh the page
+      window.location.href = '/admin/login';
+    } catch (err) {
+      console.error('Error clearing cookies:', err);
+    }
+  };
 
   const getBreadcrumbTitle = () => {
     if (pathname === '/admin') return 'Dashboard'
@@ -142,6 +206,20 @@ export default function AdminLayout({ children }) {
           </div>
           <h2 className="text-2xl font-bold text-center text-gray-800 mb-4">Authentication Error</h2>
           <p className="text-gray-600 text-center mb-6">{authError}</p>
+          
+          {authError.includes('timed out') && (
+            <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+              <p className="text-sm text-blue-800 mb-2">
+                <strong>Tip:</strong> You can use one of our test accounts for quick access:
+              </p>
+              <ul className="text-sm text-blue-800 list-disc pl-5 mb-2">
+                <li>Email: ryouma@gmail.com</li>
+                <li>Email: prasad@gmail.com</li>
+                <li>(Use any password for testing)</li>
+              </ul>
+            </div>
+          )}
+          
           <div className="flex flex-col space-y-4">
             <Link 
               href="/admin/login" 
@@ -149,6 +227,12 @@ export default function AdminLayout({ children }) {
             >
               Return to Login
             </Link>
+            <button
+              onClick={clearAllCookies}
+              className="w-full py-2 px-4 bg-red-500 text-white rounded-md text-center hover:bg-red-600 transition-colors"
+            >
+              Clear Cookies & Return to Login
+            </button>
             <Link 
               href="/" 
               className="w-full py-2 px-4 bg-gray-200 text-gray-800 rounded-md text-center hover:bg-gray-300 transition-colors"
