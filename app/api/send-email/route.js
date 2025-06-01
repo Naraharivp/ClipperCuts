@@ -82,54 +82,138 @@ export async function POST(request) {
     
     console.log('Preparing email for:', booking.customer_email);
 
-    // Create email content
+    // Create email content with improved professional design
     const mailOptions = {
       from: `"ClipperCuts Barbershop" <${process.env.EMAIL_USER || 'noreply@clippercuts.com'}>`,
       to: booking.customer_email,
-      subject: 'Konfirmasi Booking - ClipperCuts',
+      subject: 'Konfirmasi Booking - ClipperCuts Barbershop',
       html: `
-        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 5px;">
-          <div style="text-align: center; margin-bottom: 20px;">
-            <h1 style="color: #333; margin-bottom: 5px;">Booking Dikonfirmasi!</h1>
-            <p style="color: #666;">Terima kasih telah memilih ClipperCuts</p>
-          </div>
-          
-          <div style="background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px;">
-            <h2 style="color: #333; font-size: 18px; margin-top: 0;">Detail Booking:</h2>
-            <table style="width: 100%; border-collapse: collapse;">
-              <tr>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee; width: 40%;"><strong>Nama:</strong></td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${booking.customer_name}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Tanggal:</strong></td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${formattedDate}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Waktu:</strong></td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${formattedTime}</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Layanan:</strong></td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${serviceDetails.title} (${serviceDetails.price})</td>
-              </tr>
-              <tr>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Barber:</strong></td>
-                <td style="padding: 8px 0; border-bottom: 1px solid #eee;">${barberDetails.name}</td>
-              </tr>
-              ${booking.notes ? `
-              <tr>
-                <td style="padding: 8px 0;"><strong>Catatan:</strong></td>
-                <td style="padding: 8px 0;">${booking.notes}</td>
-              </tr>` : ''}
-            </table>
-          </div>
-          
-          <div style="margin-top: 20px; text-align: center; color: #666; font-size: 14px;">
-            <p>Jika ada pertanyaan atau perubahan jadwal, silakan hubungi kami.</p>
-            <p>© ${new Date().getFullYear()} ClipperCuts Barbershop. All rights reserved.</p>
-          </div>
-        </div>
+        <!DOCTYPE html>
+        <html lang="id">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Konfirmasi Booking</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333333; background-color: #f9f9f9;">
+          <table cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 8px rgba(0,0,0,0.05);">
+            <!-- Header -->
+            <tr>
+              <td style="background-color: #2a2a2a; padding: 30px 0; text-align: center;">
+                <h1 style="color: #ffffff; margin: 0; font-size: 26px; font-weight: 700;">ClipperCuts Barbershop</h1>
+                <p style="color: #d4af37; margin: 5px 0 0; font-size: 16px; font-style: italic;">Premium Grooming Experience</p>
+              </td>
+            </tr>
+            
+            <!-- Main Content -->
+            <tr>
+              <td style="padding: 40px 30px;">
+                <h2 style="margin: 0 0 20px; color: #2a2a2a; font-size: 22px; text-align: center;">Booking Anda Telah Dikonfirmasi</h2>
+                
+                <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.5;">
+                  Halo <strong>${booking.customer_name}</strong>,
+                </p>
+                
+                <p style="margin: 0 0 25px; font-size: 16px; line-height: 1.5;">
+                  Terima kasih telah memilih ClipperCuts Barbershop. Kami dengan senang hati mengkonfirmasi booking Anda dengan detail sebagai berikut:
+                </p>
+                
+                <!-- Booking Details Box -->
+                <table cellpadding="0" cellspacing="0" width="100%" style="background-color: #f5f5f5; border-radius: 6px; margin-bottom: 25px;">
+                  <tr>
+                    <td style="padding: 25px;">
+                      <table cellpadding="0" cellspacing="0" width="100%">
+                        <tr>
+                          <td width="140" style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; font-weight: 600;">No. Booking:</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;">#${new Date().getTime().toString().slice(-6)}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; font-weight: 600;">Tanggal:</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;">${formattedDate}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; font-weight: 600;">Waktu:</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;">${formattedTime}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; font-weight: 600;">Layanan:</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;">${serviceDetails.title}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; font-weight: 600;">Harga:</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;">${serviceDetails.price}</td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; font-weight: 600;">Barber:</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;">${barberDetails.name}</td>
+                        </tr>
+                        ${booking.notes ? `
+                        <tr>
+                          <td style="padding: 8px 0; font-weight: 600;">Catatan:</td>
+                          <td style="padding: 8px 0;">${booking.notes}</td>
+                        </tr>` : ''}
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+                
+                <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.5;">
+                  Kami sangat menghargai kepercayaan Anda dan berkomitmen untuk memberikan pengalaman grooming terbaik. Harap datang 10 menit sebelum jadwal untuk memastikan layanan tepat waktu.
+                </p>
+                
+                <p style="margin: 0 0 20px; font-size: 16px; line-height: 1.5;">
+                  Jika Anda perlu mengubah atau membatalkan janji, mohon hubungi kami minimal 2 jam sebelumnya.
+                </p>
+                
+                <p style="margin: 0; font-size: 16px; line-height: 1.5;">
+                  Sampai jumpa di ClipperCuts Barbershop!
+                </p>
+              </td>
+            </tr>
+            
+            <!-- Call to Action -->
+            <tr>
+              <td style="padding: 0 30px 30px;">
+                <div style="background-color: #d4af37; color: #2a2a2a; text-align: center; padding: 15px; border-radius: 6px; font-weight: 600; font-size: 16px;">
+                  Tunjukkan email ini saat kedatangan Anda
+                </div>
+              </td>
+            </tr>
+            
+            <!-- Store Info -->
+            <tr>
+              <td style="background-color: #f5f5f5; padding: 25px 30px; border-top: 1px solid #e0e0e0;">
+                <table cellpadding="0" cellspacing="0" width="100%">
+                  <tr>
+                    <td style="padding-bottom: 15px;">
+                      <h3 style="margin: 0 0 10px; font-size: 16px; color: #2a2a2a;">ClipperCuts Barbershop</h3>
+                      <p style="margin: 0; font-size: 14px; color: #666666; line-height: 1.5;">
+                        Jl. Merdeka No. 123<br>
+                        Jakarta Selatan<br>
+                        Telp: (021) 123-4567<br>
+                        Email: info@clippercuts.com
+                      </p>
+                    </td>
+                    <td style="text-align: right; vertical-align: top;">
+                      <p style="margin: 0; font-size: 14px; color: #666666;">
+                        <a href="https://clippercuts.com" style="color: #d4af37; text-decoration: none;">clippercuts.com</a>
+                      </p>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            
+            <!-- Footer -->
+            <tr>
+              <td style="background-color: #2a2a2a; padding: 20px 30px; text-align: center; color: #ffffff; font-size: 12px;">
+                <p style="margin: 0 0 10px;">&copy; ${new Date().getFullYear()} ClipperCuts Barbershop. All rights reserved.</p>
+                <p style="margin: 0;">Email ini dikirim otomatis, mohon jangan membalas.</p>
+              </td>
+            </tr>
+          </table>
+        </body>
+        </html>
       `
     };
 
