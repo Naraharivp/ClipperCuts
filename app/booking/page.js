@@ -13,7 +13,12 @@ import {
   SelectValue 
 } from '@/components/ui/select'
 import { timeSlots, formatTime } from '@/lib/utils'
-import { supabase, getBarbers, getServices, createBooking, checkAvailability } from '@/lib/supabase'
+import { 
+  getBarbers, 
+  getServices, 
+  createBooking, 
+  checkAvailability 
+} from '@/lib/supabase'
 
 export default function BookingPage() {
   const [date, setDate] = useState(null)
@@ -40,12 +45,12 @@ export default function BookingPage() {
         // Fetch barbers
         const { data: barbersData, error: barbersError } = await getBarbers()
         if (barbersError) throw barbersError
-        setBarbers(barbersData)
+        setBarbers(barbersData || [])
 
         // Fetch services
         const { data: servicesData, error: servicesError } = await getServices()
         if (servicesError) throw servicesError
-        setServices(servicesData)
+        setServices(servicesData || [])
       } catch (error) {
         console.error('Error fetching data:', error)
         setError('Failed to load data. Please try again later.')
@@ -88,6 +93,14 @@ export default function BookingPage() {
   const handleInputChange = (e) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
+  }
+
+  const handleBarberChange = (value) => {
+    setBarber(value)
+  }
+
+  const handleServiceChange = (value) => {
+    setService(value)
   }
 
   const handleSubmit = async (e) => {
@@ -162,15 +175,15 @@ export default function BookingPage() {
                 />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold mb-4">Booking Confirmed!</h2>
+            <h2 className="text-2xl font-bold mb-4">Booking Dikonfirmasi!</h2>
             <p className="text-gray-600 mb-6">
-              Thank you for booking with ClipperCuts. We've sent a confirmation email to {formData.email} with all the details.
+              Terima kasih telah melakukan booking di ClipperCuts. Kami telah mengirimkan konfirmasi booking ke email {formData.email} dengan semua detail booking Anda.
             </p>
             <div className="bg-gray-50 p-4 rounded-md mb-6 text-left">
-              <p className="font-bold mb-2">Booking Details:</p>
-              <p>Date: {date ? format(date, 'MMMM dd, yyyy') : ''}</p>
-              <p>Time: {timeSlot ? formatTime(timeSlot) : ''}</p>
-              <p>Service: {services.find(s => s.id === service)?.title || ''}</p>
+              <p className="font-bold mb-2">Detail Booking:</p>
+              <p>Tanggal: {date ? format(date, 'MMMM dd, yyyy') : ''}</p>
+              <p>Waktu: {timeSlot ? formatTime(timeSlot) : ''}</p>
+              <p>Layanan: {services.find(s => s.id === service)?.title || ''}</p>
               <p>Barber: {barbers.find(b => b.id === barber)?.name || ''}</p>
             </div>
             <Button
@@ -190,7 +203,7 @@ export default function BookingPage() {
                 })
               }}
             >
-              Book Another Appointment
+              Buat Booking Lainnya
             </Button>
           </div>
         </div>
@@ -247,32 +260,40 @@ export default function BookingPage() {
                   
                   <div className="mb-6">
                     <Label htmlFor="service" className="block mb-2">Select Service</Label>
-                    <Select value={service} onValueChange={setService}>
+                    <Select value={service} onValueChange={handleServiceChange}>
                       <SelectTrigger id="service" className="w-full">
                         <SelectValue placeholder="Select a service" />
                       </SelectTrigger>
                       <SelectContent>
-                        {services.map((service) => (
-                          <SelectItem key={service.id} value={service.id}>
-                            {service.title} - {service.price}
-                          </SelectItem>
-                        ))}
+                        {services.length === 0 ? (
+                          <SelectItem value="loading" disabled>Loading services...</SelectItem>
+                        ) : (
+                          services.map((svc) => (
+                            <SelectItem key={svc.id} value={svc.id}>
+                              {svc.title} - {svc.price}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
                   
                   <div className="mb-6">
                     <Label htmlFor="barber" className="block mb-2">Select Barber</Label>
-                    <Select value={barber} onValueChange={setBarber}>
+                    <Select value={barber} onValueChange={handleBarberChange}>
                       <SelectTrigger id="barber" className="w-full">
                         <SelectValue placeholder="Select a barber" />
                       </SelectTrigger>
                       <SelectContent>
-                        {barbers.map((barber) => (
-                          <SelectItem key={barber.id} value={barber.id}>
-                            {barber.name}
-                          </SelectItem>
-                        ))}
+                        {barbers.length === 0 ? (
+                          <SelectItem value="loading" disabled>Loading barbers...</SelectItem>
+                        ) : (
+                          barbers.map((brb) => (
+                            <SelectItem key={brb.id} value={brb.id}>
+                              {brb.name}
+                            </SelectItem>
+                          ))
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -352,7 +373,7 @@ export default function BookingPage() {
                 className="w-full py-3 text-lg font-semibold"
                 disabled={!date || !timeSlot || !barber || !service || !formData.name || !formData.email || !formData.phone || loading}
               >
-                {loading ? 'Processing...' : 'Confirm Booking'}
+                {loading ? 'Processing...' : 'Konfirmasi Booking'}
               </Button>
             </form>
           </div>

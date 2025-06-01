@@ -140,6 +140,32 @@ The application can be deployed to Vercel with the following steps:
 3. Configure environment variables in the Vercel dashboard
 4. Deploy
 
+## Email Configuration
+
+To enable email sending for booking confirmations, create a `.env.local` file in the root directory with the following configuration:
+
+```env
+# Email Configuration
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_SECURE=false
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
+```
+
+### Notes for Gmail:
+
+1. For Gmail, you'll need to use an App Password instead of your regular password
+2. To generate an App Password:
+   - Enable 2-Step Verification for your Google account
+   - Go to https://myaccount.google.com/apppasswords
+   - Select "Mail" and your device, then generate
+   - Use the generated 16-character password as EMAIL_PASS
+
+### Testing Email Functionality:
+
+If you don't configure the email settings, the system will use a mock email service that logs email content to the console. This is useful for development and testing.
+
 ## License
 
 This project is licensed under the MIT License.
