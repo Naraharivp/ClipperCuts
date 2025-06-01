@@ -188,8 +188,8 @@ export async function POST(request) {
                     <td style="padding-bottom: 15px;">
                       <h3 style="margin: 0 0 10px; font-size: 16px; color: #2a2a2a;">ClipperCuts Barbershop</h3>
                       <p style="margin: 0; font-size: 14px; color: #666666; line-height: 1.5;">
-                        Jl. Merdeka No. 123<br>
-                        Jakarta Selatan<br>
+                        Jl. Pogung Kidul No.2a, Pogung Kidul, Sinduadi, <br>
+                        Kabupaten Sleman, Daerah Istimewa Yogyakarta 55284<br>
                         Telp: (021) 123-4567<br>
                         Email: info@clippercuts.com
                       </p>
