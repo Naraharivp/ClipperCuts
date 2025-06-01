@@ -194,11 +194,6 @@ export async function POST(request) {
                         Email: info@clippercuts.com
                       </p>
                     </td>
-                    <td style="text-align: right; vertical-align: top;">
-                      <p style="margin: 0; font-size: 14px; color: #666666;">
-                        <a href="https://clippercuts.com" style="color: #d4af37; text-decoration: none;">clippercuts.com</a>
-                      </p>
-                    </td>
                   </tr>
                 </table>
               </td>
