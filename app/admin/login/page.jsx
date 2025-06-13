@@ -38,6 +38,21 @@ export default function LoginPage() {
           </div>
         )}
 
+        {/* Login hint box */}
+        <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
+          <p className="text-sm text-blue-800 font-medium mb-2">
+            Demo Accounts:
+          </p>
+          <ul className="text-sm text-blue-800 list-disc pl-5 mb-2">
+            <li><strong>Email:</strong> ryouma@gmail.com</li>
+            <li><strong>Email:</strong> prasad@gmail.com</li>
+            <li><strong>Password:</strong> Use any password for testing</li>
+          </ul>
+          <p className="text-xs text-blue-600 mt-2">
+            Login with any of these accounts to access the admin panel.
+          </p>
+        </div>
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
@@ -50,6 +65,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               required
+              placeholder="Enter your email"
             />
           </div>
 
@@ -64,6 +80,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
               required
+              placeholder="Enter any password for demo accounts"
             />
           </div>
 
