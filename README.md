@@ -19,10 +19,36 @@ ClipperCuts is a modern, responsive web application for a barbershop that allows
 
 ## Tech Stack
 
-- **Frontend Framework:** Next.js 14 (App Router)
-- **UI Library:** Tailwind CSS with Radix UI components
-- **Backend:** Supabase (Authentication, Database, Storage)
-- **Deployment:** Vercel
+This project is built using modern, industry-standard technologies and best practices:
+
+### Frontend
+- **Next.js 14** - Latest version of the React framework with App Router and Server Components
+- **React 18** - Latest version with concurrent features and improved performance
+- **TypeScript** - For type-safe development and better code maintainability
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development
+- **Radix UI** - Unstyled, accessible components for building high‑quality design systems
+- **Next Themes** - For implementing dark/light mode with system preference detection
+
+### Backend & Infrastructure
+- **Supabase** - Open source Firebase alternative for authentication and database
+- **Next.js API Routes** - Serverless API endpoints for backend functionality
+- **Nodemailer** - For handling email notifications and confirmations
+
+### Development Tools & Best Practices
+- **ESLint** - For code quality and consistency
+- **PostCSS** - For advanced CSS processing
+- **Vercel** - For production deployment and hosting
+- **Git** - Version control and collaboration
+
+### Key Features
+- Server-side rendering (SSR) and static site generation (SSG)
+- Responsive design with mobile-first approach
+- Real-time data synchronization
+- Secure authentication system
+- Email notification system
+- Dark/Light mode support
+- Accessible UI components
+- SEO optimized
 
 ## Getting Started
 
