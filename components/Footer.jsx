@@ -56,6 +56,11 @@ export default function Footer() {
                   Book Appointment
                 </Link>
               </li>
+              <li>
+                <Link href="/admin" className="text-gray-300 hover:text-secondary">
+                  Admin
+                </Link>
+              </li>
             </ul>
           </div>
 

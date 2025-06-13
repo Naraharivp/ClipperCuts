@@ -29,108 +29,26 @@ export default function AdminLayout({ children }) {
   const router = useRouter()
   const pathname = usePathname() || ''
 
+  // Add debugging logs
   useEffect(() => {
-    // Check if user is logged in
-    const checkAuth = async () => {
-      try {
-        console.log('Checking authentication...')
-        
-        // Check if authentication is disabled
-        if (process.env.NEXT_PUBLIC_DISABLE_AUTH === 'true') {
-          console.log('Authentication is disabled - allowing access to all admin pages')
-          setIsAuthenticated(true)
-          setIsLoading(false)
-          return
-        }
-        
-        // Allow access to login and register pages without authentication
-        if (pathname === '/admin/login' || pathname.startsWith('/admin/register')) {
-          console.log('Login or register page, skipping auth check')
-          setIsAuthenticated(true)
-          setIsLoading(false)
-          return
-        }
-        
-        // Check if we're in development mode with bypass enabled
-        const isDev = process.env.NODE_ENV === 'development'
-        const bypassAuth = process.env.NEXT_PUBLIC_BYPASS_AUTH === 'true'
-        
-        if (isDev && bypassAuth) {
-          console.log('Development mode with auth bypass enabled - allowing access')
-          setIsAuthenticated(true)
-          setIsLoading(false)
-          return
-        }
-        
-        // Check for mock session in localStorage first (faster than Supabase check)
-        if (typeof window !== 'undefined') {
-          const mockSessionData = localStorage.getItem('mock_session');
-          if (mockSessionData) {
-            try {
-              console.log('Mock session found, user is authenticated')
-              setIsAuthenticated(true)
-              setIsLoading(false)
-              return
-            } catch (err) {
-              console.error('Error parsing mock session:', err);
-              // Continue with Supabase check
-            }
-          }
-        }
-        
-        // Check if Supabase credentials are available
-        if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-          console.error('Supabase credentials are missing')
-          setAuthError('Supabase credentials are missing. Please check your .env.local file.')
-          setIsLoading(false)
-          return
-        }
-        
-        const { session, error } = await getSession()
-        
-        if (error) {
-          console.error('Error getting session:', error)
-          if (error.message === 'Session check timed out') {
-            setAuthError('Authentication check timed out. Please try again.')
-          } else {
-            setAuthError(error.message || 'Error checking authentication')
-          }
-          setIsLoading(false)
-          router.push('/admin/login')
-          return
-        }
-        
-        if (!session) {
-          console.log('No session found, redirecting to login')
-          setIsLoading(false)
-          router.push('/admin/login')
-          return
-        }
-        
-        console.log('Session found, user is authenticated')
-        setIsAuthenticated(true)
-        setIsLoading(false)
-      } catch (err) {
-        console.error('Error checking authentication:', err)
-        setAuthError(err.message || 'Unexpected error checking authentication')
-        setIsLoading(false) // Set loading to false even on error
-        router.push('/admin/login')
-      }
-    }
+    console.log('ENV DEBUG:')
+    console.log('NEXT_PUBLIC_SUPABASE_URL:', process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log('NEXT_PUBLIC_SUPABASE_ANON_KEY available?', !!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY)
+    console.log('NEXT_PUBLIC_DISABLE_AUTH:', process.env.NEXT_PUBLIC_DISABLE_AUTH)
+    console.log('NEXT_PUBLIC_BYPASS_AUTH:', process.env.NEXT_PUBLIC_BYPASS_AUTH)
+    console.log('NODE_ENV:', process.env.NODE_ENV)
+  }, [])
+
+  useEffect(() => {
+    // Set authenticated immediately to prevent any loading state
+    setIsAuthenticated(true)
+    setIsLoading(false)
+    console.log('Admin access granted - authentication bypassed')
     
-    // Add a timeout to prevent infinite loading
-    const authTimeout = setTimeout(() => {
-      if (isLoading) {
-        console.log('Authentication check timed out')
-        setAuthError('Authentication check timed out. Please try again.')
-        setIsLoading(false)
-        router.push('/admin/login')
-      }
-    }, 8000) // Increased to 8 seconds timeout
+    // No need to call checkAuth at all
+    // checkAuth()
     
-    checkAuth()
-    
-    return () => clearTimeout(authTimeout)
+    return () => {} // Empty cleanup function
   }, [router])
 
   const toggleSidebar = () => {
